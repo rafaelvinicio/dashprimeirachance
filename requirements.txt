@@ -1,0 +1,7 @@
+streamlit
+pandas
+numpy
+plotly
+gspread
+gspread-dataframe
+urllib3

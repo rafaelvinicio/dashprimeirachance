@@ -1,0 +1,238 @@
+/* Tema base com cores institucionais */
+:root {
+  --primary: #0050b3;
+  --primary-light: #e6f7ff;
+  --secondary: #00b8d9;
+  --text-primary: #2e3a59;
+  --text-secondary: #697386;
+  --success: #36b37e;
+  --warning: #ffab00;
+  --danger: #ff5630;
+  --bg-light: #f8fafc;
+  --card-bg: #ffffff;
+}
+
+/* Reset e base */
+.main {
+  background-color: var(--bg-light);
+  color: var(--text-primary);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Header e títulos */
+h1,
+h2,
+h3 {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.3rem;
+}
+
+/* Cards modernos */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Headers dos cards */
+.card-header {
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* Indicadores e estatísticas */
+.stat-card {
+  text-align: center;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0.3rem 0;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.stat-trend {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trend-up {
+  color: var(--success);
+}
+
+.trend-down {
+  color: var(--danger);
+}
+
+/* Filtros e controles */
+.filter-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.filter-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* Tabelas e DataFrames */
+.dataframe-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: white;
+}
+
+/* Select boxes e inputs customizados */
+div[data-baseweb="select"] {
+  border-radius: 0.3rem;
+}
+
+/* Gráficos e visualizações */
+.chart-container {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  margin-bottom: 1rem;
+}
+
+/* Categorias de eficiência */
+.efficiency-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+}
+
+.efficiency-high {
+  background-color: var(--success);
+}
+
+.efficiency-medium {
+  background-color: var(--warning);
+}
+
+.efficiency-low {
+  background-color: var(--danger);
+}
+
+/* Banner e logo */
+.logo-container {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-container img {
+  max-width: 280px;
+  height: auto;
+}
+
+/* Ajustes para responsividade */
+@media screen and (max-width: 1200px) {
+  .stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Cores para as categorias de eficiência */
+.category-excelente {
+  color: var(--success);
+}
+
+.category-medio {
+  color: var(--warning);
+}
+
+.category-baixo {
+  color: var(--danger);
+}
+
+/* Tooltips customizados */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: var(--text-primary);
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8rem;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Eliminar os elementos de decoração do Streamlit */
+#MainMenu {
+  visibility: hidden;
+}
+footer {
+  visibility: hidden;
+}
+header {
+  visibility: hidden;
+}
