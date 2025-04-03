@@ -23,9 +23,7 @@ st.set_page_config(
     page_title="Dashboard Analítico - Programa Primeira Chance 2025",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded",
-    # Forçar o tema claro
-    theme="light"
+    initial_sidebar_state="expanded"
 )
 
 # Carregar CSS
