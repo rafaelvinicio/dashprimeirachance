@@ -12,18 +12,37 @@
   --card-bg: #ffffff;
 }
 
+/* Forçar tema claro - Regras base */
+body {
+  background-color: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+}
+
 /* Reset e base */
 .main {
-  background-color: var(--bg-light);
-  color: var(--text-primary);
+  background-color: var(--bg-light) !important;
+  color: var(--text-primary) !important;
   font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Forçar cores claras em elementos Streamlit específicos */
+.stApp,
+.stSidebarContent,
+[data-testid="stAppViewContainer"] {
+  background-color: var(--bg-light) !important;
+}
+
+/* Sidebar sempre com fundo claro */
+.css-1d391kg,
+.css-12oz5g7 {
+  background-color: #f2f5f9 !important;
 }
 
 /* Header e títulos */
 h1,
 h2,
 h3 {
-  color: var(--primary);
+  color: var(--primary) !important;
   font-weight: 600;
 }
 
@@ -235,4 +254,51 @@ footer {
 }
 header {
   visibility: hidden;
+}
+
+/* Correções específicas para o tema claro */
+.stSelectbox,
+.stRadio {
+  color: var(--text-primary) !important;
+}
+
+/* Forçar fundo claro em widgets */
+.stCheckbox,
+.stRadio > div,
+.stSelectbox > div {
+  background-color: white !important;
+}
+
+/* Garantir que os botões tenham texto escuro */
+.stButton > button {
+  color: var(--text-primary) !important;
+}
+
+/* Download button específico */
+.stDownloadButton > button {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+/* Forçar fonte legível */
+div,
+p,
+span {
+  color: var(--text-primary) !important;
+}
+
+/* Cores fixas para texto nos inputs */
+input,
+select,
+textarea {
+  color: #2e3a59 !important;
+}
+
+/* Forçar cor clara em DataFrames */
+.dataframe tbody {
+  background-color: white !important;
+}
+.dataframe th {
+  background-color: #f2f5f9 !important;
+  color: var(--text-primary) !important;
 }

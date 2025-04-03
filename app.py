@@ -23,12 +23,45 @@ st.set_page_config(
     page_title="Dashboard Analítico - Programa Primeira Chance 2025",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    # Forçar o tema claro
+    theme="light"
 )
 
 # Carregar CSS
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Injetar CSS adicional para forçar o tema claro
+st.markdown("""
+<style>
+    /* Forçar tema claro independente das configurações do sistema */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebarContent"] {
+        background-color: #F8FAFC !important;
+    }
+    .stApp {
+        background-color: #F8FAFC !important;
+    }
+    .main {
+        background-color: #F8FAFC !important;
+        color: #2E3A59 !important;
+    }
+    .st-eb {
+        background-color: #FFFFFF !important;
+    }
+    .st-bb {
+        background-color: #0050B3 !important;
+    }
+    .st-bc {
+        color: #0050B3 !important;
+    }
+    /* Garantir que o texto seja escuro */
+    .st-cx, .st-cy, .st-cz, .st-da, .st-db, .st-dc, .st-dd, .st-de,
+    .st-cg, .st-ch, .st-ci, .st-cj, .st-ae, .st-af, .st-ag, .st-ai, .st-bu {
+        color: #2E3A59 !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Logo e cabeçalho
 st.markdown("""
