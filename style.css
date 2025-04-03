@@ -27,15 +27,23 @@ body {
 
 /* Forçar cores claras em elementos Streamlit específicos */
 .stApp,
-.stSidebarContent,
 [data-testid="stAppViewContainer"] {
   background-color: var(--bg-light) !important;
 }
 
 /* Sidebar sempre com fundo claro */
 .css-1d391kg,
-.css-12oz5g7 {
-  background-color: #f2f5f9 !important;
+.css-12oz5g7,
+[data-testid="stSidebarContent"],
+div[data-testid="stSidebar"] {
+  background-color: white !important;
+}
+
+/* Todos os elementos dentro da sidebar */
+.sidebar .sidebar-content,
+[data-testid="stSidebarNav"],
+[data-testid="stSidebarUserContent"] {
+  background-color: white !important;
 }
 
 /* Header e títulos */
@@ -267,6 +275,30 @@ header {
 .stRadio > div,
 .stSelectbox > div {
   background-color: white !important;
+}
+
+/* Estilização específica para a sidebar */
+[data-testid="stSidebar"] {
+  background-color: white !important;
+  border-right: 1px solid #f0f0f0;
+}
+
+/* Estilos para os componentes dentro da sidebar */
+[data-testid="stSidebar"] .filter-container {
+  border: 1px solid #f0f0f0;
+  background-color: white !important;
+}
+
+/* Garantir que os botões na sidebar tenham fundo compatível */
+[data-testid="stSidebar"] button {
+  background-color: var(--primary) !important;
+  color: white !important;
+}
+
+/* Estilos para os radios e checkboxes na sidebar */
+[data-testid="stSidebar"] .stRadio label,
+[data-testid="stSidebar"] .stCheckbox label {
+  color: var(--text-primary) !important;
 }
 
 /* Garantir que os botões tenham texto escuro */
