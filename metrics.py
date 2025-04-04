@@ -135,6 +135,13 @@ def display_top_performers(filtered_df, column_name):
         entity_name = entity[column_name]
         taxa = entity['TAXA_EFICIENCIA']
 
+        # Garantir que exibimos o nome completo da entidade
+        # Se estamos visualizando por GREs, adicionar "GRE" antes do número
+        if column_name == 'GRE':
+            display_name = f"GRE {entity_name}"
+        else:
+            display_name = entity_name
+
         # Exibir entidade com estilo de ranking
         st.markdown(f"""
         <div style='display: flex; align-items: center; margin-bottom: 10px; padding: 8px; background-color: {"#F9FAFB" if i % 2 == 0 else "white"}; border-radius: 4px;'>
@@ -142,7 +149,7 @@ def display_top_performers(filtered_df, column_name):
                 {i}
             </div>
             <div style='flex-grow: 1;'>
-                <div style='font-weight: 600; font-size: 0.9rem;'>{entity_name}</div>
+                <div style='font-weight: 600; font-size: 0.9rem;'>{display_name}</div>
                 <div style='font-size: 0.8rem; color: #6B7280;'>
                     {entity['INSCRITOS']} inscritos de {entity['MATRICULAS']} matriculados
                 </div>
