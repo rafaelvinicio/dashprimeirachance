@@ -46,6 +46,75 @@ def display_data_table(table_df, column_name, display_option):
     """
     Exibe a tabela de dados com formatação
     """
+    # Criar uma cópia do DataFrame para evitar modificar o original
+    table_df = table_df.copy()
+
+    # Verificar quais colunas estão disponíveis no DataFrame
+    available_columns = []
+
+    # Adicionar colunas relacionadas apenas se existirem no DataFrame
+    if display_option == "Escolas" and 'GRE' in table_df.columns:
+        available_columns.append('GRE')
+    if display_option == "Escolas" and 'CIDADE' in table_df.columns:
+        available_columns.append('CIDADE')
+
+    # Garantir que as colunas principais existem
+    if column_name in table_df.columns:
+        available_columns.append(column_name)
+
+    for col in ['MATRICULAS', 'INSCRITOS', 'TAXA_EFICIENCIA', 'CATEGORIA']:
+        if col in table_df.columns:
+            available_columns.append(col)
+
+    # Se não encontrar as colunas principais, exibir mensagem de erro e sair
+    if len(available_columns) < 3:  # Pelo menos o column_name e algumas métricas
+        st.error(f"Dados insuficientes para exibir a tabela de {display_option}.")
+        return
+
+    # Filtrar apenas as colunas disponíveis
+    table_df = table_df[available_columns]
+
+    # Se estamos visualizando por GREs, adicionar "GRE" antes do número
+    if column_name == 'GRE' and 'GRE' in table_df.columns:
+        table_df['GRE'] = "GRE " + table_df['GRE'].astype(str)
+
+    # Mapeamento de nomes de colunas para exibição
+    column_mapping = {
+        'GRE': 'GRE',
+        'CIDADE': 'Cidade',
+        'ESCOLA': 'Escola',
+        'MATRICULAS': 'Matriculados',
+        'INSCRITOS': 'Inscritos',
+        'TAXA_EFICIENCIA': 'Taxa (%)',
+        'CATEGORIA': 'Categoria'
+    }
+
+    # Adicionar o mapeamento para o column_name dinâmico
+    if column_name not in column_mapping:
+        column_mapping[column_name] = display_option.rstrip('s')
+
+    # Aplicar mapeamento apenas às colunas disponíveis
+    valid_mapping = {col: column_mapping.get(col, col) for col in table_df.columns}
+    table_df = table_df.rename(columns=valid_mapping)
+
+    # Formatar a taxa para exibição se existir
+    if 'Taxa (%)' in table_df.columns:
+        table_df['Taxa (%)'] = table_df['Taxa (%)'].round(1)
+        sort_col = 'Taxa (%)'
+    else:
+        # Alternativa para ordenação caso não exista a coluna Taxa
+        sort_col = table_df.columns[0]
+
+    # Exibir tabela
+    st.dataframe(
+        table_df.sort_values(sort_col, ascending=False),
+        hide_index=True,
+        use_container_width=True,
+        height=min(400, 100 + len(table_df) * 35)
+    )
+    """
+    Exibe a tabela de dados com formatação
+    """
     # Remover colunas desnecessárias e renomear para exibição
     display_columns = []
     if display_option == "Escolas" and 'GRE' in table_df.columns:
