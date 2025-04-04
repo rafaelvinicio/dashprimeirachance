@@ -1,4 +1,4 @@
-/* Tema base com cores institucionais */
+/* Tema base com cores institucionais e variáveis CSS */
 :root {
   --primary: #0050b3;
   --primary-light: #e6f7ff;
@@ -10,47 +10,36 @@
   --danger: #ff5630;
   --bg-light: #f8fafc;
   --card-bg: #ffffff;
+
+  /* Variáveis para temas - serão sobrescritas pelo seletor de tema */
+  --background-color: #f8fafc;
+  --text-color: #2e3a59;
+  --sidebar-bg: #f2f5f9;
+  --card-bg: #ffffff;
+  --card-header-color: #0050b3;
+  --card-border: 1px solid #f0f0f0;
+  --hover-bg: #f5f5f5;
+  --input-bg: #ffffff;
+  --input-border: 1px solid #e2e8f0;
 }
 
-/* Forçar tema claro - Regras base */
+/* Estilos base que usam as variáveis de tema */
 body {
-  background-color: var(--bg-light) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Reset e base */
-.main {
-  background-color: var(--bg-light) !important;
-  color: var(--text-primary) !important;
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* Forçar cores claras em elementos Streamlit específicos */
-.stApp,
-[data-testid="stAppViewContainer"] {
-  background-color: var(--bg-light) !important;
-}
-
-/* Sidebar sempre com fundo claro */
-.css-1d391kg,
-.css-12oz5g7,
-[data-testid="stSidebarContent"],
-div[data-testid="stSidebar"] {
-  background-color: white !important;
-}
-
-/* Todos os elementos dentro da sidebar */
-.sidebar .sidebar-content,
-[data-testid="stSidebarNav"],
-[data-testid="stSidebarUserContent"] {
-  background-color: white !important;
+.main {
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 /* Header e títulos */
 h1,
 h2,
 h3 {
-  color: var(--primary) !important;
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -79,6 +68,7 @@ h3 {
   padding: 1rem;
   margin-bottom: 1rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  border: var(--card-border);
 }
 
 .card:hover {
@@ -92,17 +82,18 @@ h3 {
   margin-bottom: 0.8rem;
   padding-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--card-header-color);
 }
 
 /* Indicadores e estatísticas */
 .stat-card {
   text-align: center;
   padding: 0.8rem;
-  background: white;
+  background: var(--card-bg);
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   height: 100%;
+  border: var(--card-border);
 }
 
 .stat-value {
@@ -135,11 +126,12 @@ h3 {
 
 /* Filtros e controles */
 .filter-container {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  border: var(--card-border);
 }
 
 .filter-title {
@@ -153,21 +145,24 @@ h3 {
 .dataframe-container {
   border-radius: 0.5rem;
   overflow: hidden;
-  background: white;
+  background: var(--card-bg);
 }
 
 /* Select boxes e inputs customizados */
 div[data-baseweb="select"] {
   border-radius: 0.3rem;
+  background-color: var(--input-bg);
+  border: var(--input-border);
 }
 
 /* Gráficos e visualizações */
 .chart-container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
   margin-bottom: 1rem;
+  border: var(--card-border);
 }
 
 /* Categorias de eficiência */
@@ -195,7 +190,7 @@ div[data-baseweb="select"] {
 /* Banner e logo */
 .logo-container {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .logo-container img {
@@ -253,7 +248,43 @@ div[data-baseweb="select"] {
   opacity: 1;
 }
 
-/* Eliminar os elementos de decoração do Streamlit */
+/* Botão de alternância de tema */
+.theme-toggle {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: #003b87;
+}
+
+.theme-toggle svg {
+  margin-right: 8px;
+}
+
+/* Estilos específicos para modo escuro */
+/* Estes estilos serão aplicados quando as variáveis CSS forem alteradas para o tema escuro */
+[data-theme="dark"] .stButton > button {
+  background-color: #0050b3 !important;
+  color: white !important;
+}
+
+[data-theme="dark"] .stDataFrame {
+  color: var(--text-color) !important;
+  background-color: var(--card-bg) !important;
+}
+
+/* Remover decorações do Streamlit */
 #MainMenu {
   visibility: hidden;
 }
@@ -262,75 +293,4 @@ footer {
 }
 header {
   visibility: hidden;
-}
-
-/* Correções específicas para o tema claro */
-.stSelectbox,
-.stRadio {
-  color: var(--text-primary) !important;
-}
-
-/* Forçar fundo claro em widgets */
-.stCheckbox,
-.stRadio > div,
-.stSelectbox > div {
-  background-color: white !important;
-}
-
-/* Estilização específica para a sidebar */
-[data-testid="stSidebar"] {
-  background-color: white !important;
-  border-right: 1px solid #f0f0f0;
-}
-
-/* Estilos para os componentes dentro da sidebar */
-[data-testid="stSidebar"] .filter-container {
-  border: 1px solid #f0f0f0;
-  background-color: white !important;
-}
-
-/* Garantir que os botões na sidebar tenham fundo compatível */
-[data-testid="stSidebar"] button {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-/* Estilos para os radios e checkboxes na sidebar */
-[data-testid="stSidebar"] .stRadio label,
-[data-testid="stSidebar"] .stCheckbox label {
-  color: var(--text-primary) !important;
-}
-
-/* Garantir que os botões tenham texto escuro */
-.stButton > button {
-  color: var(--text-primary) !important;
-}
-
-/* Download button específico */
-.stDownloadButton > button {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-/* Forçar fonte legível */
-div,
-p,
-span {
-  color: var(--text-primary) !important;
-}
-
-/* Cores fixas para texto nos inputs */
-input,
-select,
-textarea {
-  color: #2e3a59 !important;
-}
-
-/* Forçar cor clara em DataFrames */
-.dataframe tbody {
-  background-color: white !important;
-}
-.dataframe th {
-  background-color: #f2f5f9 !important;
-  color: var(--text-primary) !important;
 }

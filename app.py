@@ -26,154 +26,80 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Carregar CSS principal
+# Função para alternar o tema
+def toggle_theme():
+    # Obter o tema atual
+    theme = st.session_state.get("theme", "auto")
+
+    # Alternar entre tema claro, escuro e automático
+    if theme == "auto":
+        st.session_state.theme = "light"
+    elif theme == "light":
+        st.session_state.theme = "dark"
+    else:
+        st.session_state.theme = "auto"
+
+    # Aplicar o tema conforme a seleção
+    apply_theme(st.session_state.theme)
+
+# Função para aplicar o tema
+def apply_theme(theme):
+    if theme == "light":
+        # Tema claro
+        st.markdown("""
+        <style>
+        :root {
+            --background-color: #F8FAFC;
+            --text-color: #2E3A59;
+            --sidebar-bg: #F2F5F9;
+            --card-bg: #FFFFFF;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    elif theme == "dark":
+        # Tema escuro
+        st.markdown("""
+        <style>
+        :root {
+            --background-color: #1E1E1E;
+            --text-color: #E0E0E0;
+            --sidebar-bg: #252526;
+            --card-bg: #2D2D2D;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    else:
+        # Tema automático (baseado nas preferências do sistema)
+        pass
+
+# Inicializar o tema na sessão (padrão: automático)
+if "theme" not in st.session_state:
+    st.session_state.theme = "auto"
+
+# Carregar CSS
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Carregar CSS específico para a sidebar
-try:
-    with open("sidebar_theme.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-except FileNotFoundError:
-    # Fallback - injeta CSS da sidebar diretamente se o arquivo não existir
+# Aplicar o tema atual
+apply_theme(st.session_state.theme)
+
+# Logo e cabeçalho em uma linha com o botão de tema
+header_cols = st.columns([3, 1])
+
+with header_cols[0]:
     st.markdown("""
-    <style>
-    /* Fallback para sidebar - fundo branco */
-    [data-testid="stSidebar"], [data-testid="stSidebarNav"], [data-testid="stSidebarUserContent"] {
-        background-color: white !important;
-    }
-    [data-testid="stSidebar"] * {
-        color: #2E3A59 !important;
-    }
-    </style>
+    <div class="logo-container">
+        <img src="https://i.postimg.cc/dVfZXQv7/Primeira-Chance-PRINCIPAL.png" alt="Programa Primeira Chance 2025">
+    </div>
     """, unsafe_allow_html=True)
 
-# Injetar CSS e JavaScript para forçar o tema claro
-st.markdown("""
-<style>
-    /* Forçar tema claro independente das configurações do sistema */
-    html, body, [data-testid="stAppViewContainer"] {
-        background-color: #F8FAFC !important;
-    }
-    .stApp {
-        background-color: #F8FAFC !important;
-    }
-    .main {
-        background-color: #F8FAFC !important;
-        color: #2E3A59 !important;
-    }
-    .st-eb {
-        background-color: #FFFFFF !important;
-    }
-    .st-bb {
-        background-color: #0050B3 !important;
-    }
-    .st-bc {
-        color: #0050B3 !important;
-    }
-    /* Garantir que o texto seja escuro */
-    .st-cx, .st-cy, .st-cz, .st-da, .st-db, .st-dc, .st-dd, .st-de,
-    .st-cg, .st-ch, .st-ci, .st-cj, .st-ae, .st-af, .st-ag, .st-ai, .st-bu {
-        color: #2E3A59 !important;
-    }
+with header_cols[1]:
+    # Mostrar o tema atual e botão para alternar
+    current_theme = {"auto": "Automático", "light": "Claro", "dark": "Escuro"}
+    st.button(f"Tema: {current_theme[st.session_state.theme]}", on_click=toggle_theme)
 
-    /* CORREÇÃO ESPECÍFICA PARA A SIDEBAR - Usando força máxima */
-    [data-testid="stSidebar"],
-    [data-testid="stSidebar"] > div,
-    [data-testid="stSidebarNav"],
-    [data-testid="stSidebarUserContent"],
-    .st-emotion-cache-16txtl3,
-    .st-emotion-cache-18ni7ap,
-    .st-emotion-cache-1cypcdb,
-    .st-emotion-cache-6qob1r,
-    .st-emotion-cache-1fttcpj,
-    .st-emotion-cache-19rxjzo,
-    .st-emotion-cache-z5fcl4,
-    section[data-testid="stSidebar"] {
-        background-color: #FFFFFF !important;
-        color: #2E3A59 !important;
-    }
-
-    /* Garantir que todos os elementos na sidebar sejam da cor certa */
-    [data-testid="stSidebar"] *,
-    section[data-testid="stSidebar"] * {
-        background-color: #FFFFFF !important;
-        color: #2E3A59 !important;
-    }
-
-    /* Exceções para elementos específicos */
-    [data-testid="stSidebar"] .stButton > button,
-    [data-testid="stSidebar"] .stDownloadButton > button,
-    section[data-testid="stSidebar"] .stButton > button {
-        background-color: #0050B3 !important;
-        color: white !important;
-    }
-
-    /* Agressivamente forçar que todos textos sejam escuros */
-    [data-testid="stSidebar"] *, [data-testid="stSidebar"] > div * {
-        color: #2E3A59 !important;
-    }
-
-    /* Exceção para badges */
-    [data-testid="stSidebar"] .efficiency-badge {
-        color: white !important;
-    }
-</style>
-
-<script>
-// Script para forçar fundo branco na sidebar
-document.addEventListener('DOMContentLoaded', function() {
-    // Função para aplicar estilo a todos os elementos da sidebar
-    function fixSidebarStyle() {
-        // Selecionar a sidebar
-        const sidebar = document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) {
-            // Aplicar estilo à sidebar
-            sidebar.style.backgroundColor = '#FFFFFF';
-
-            // Aplicar estilo a todos os elementos dentro da sidebar
-            const allElements = sidebar.querySelectorAll('*');
-            allElements.forEach(el => {
-                el.style.backgroundColor = '#FFFFFF';
-
-                // Preservar cores para botões específicos
-                if (!el.classList.contains('stButton') &&
-                    !el.classList.contains('stDownloadButton') &&
-                    !el.classList.contains('efficiency-badge')) {
-                    el.style.color = '#2E3A59';
-                }
-            });
-        }
-    }
-
-    // Executar imediatamente
-    fixSidebarStyle();
-
-    // Executar novamente após um curto atraso para pegar elementos carregados dinamicamente
-    setTimeout(fixSidebarStyle, 500);
-    setTimeout(fixSidebarStyle, 1000);
-
-    // Criar um observador para mudanças no DOM
-    const observer = new MutationObserver(function(mutations) {
-        fixSidebarStyle();
-    });
-
-    // Observar mudanças em todo o documento
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-});
-</script>
-""", unsafe_allow_html=True)
-
-# Logo e cabeçalho
-st.markdown("""
-<div class="logo-container">
-    <img src="https://i.postimg.cc/dVfZXQv7/Primeira-Chance-PRINCIPAL.png" alt="Programa Primeira Chance 2025">
-</div>
-<h1 style="text-align: center;">Dashboard Analítico - Programa Primeira Chance 2025</h1>
-""", unsafe_allow_html=True)
+# Título principal
+st.markdown("<h1 style='text-align: center;'>Dashboard Analítico - Programa Primeira Chance 2025</h1>", unsafe_allow_html=True)
 
 # Carregar dados
 with st.spinner("Carregando dados..."):
