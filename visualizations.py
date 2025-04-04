@@ -178,7 +178,6 @@ def create_ranking_chart(display_df, column_name, display_option):
         )
 
     # Layout comum para ambos os tipos de gráfico
-# Layout comum para ambos os tipos de gráfico
     fig_bar.update_layout(
         template="plotly_white",
         showlegend=False,
@@ -192,17 +191,12 @@ def create_ranking_chart(display_df, column_name, display_option):
     )
 
     return fig_bar
-
-def create_category_distribution(df):
+def create_category_distribution(filtered_df):
     """
     Cria o gráfico de distribuição por categoria
     """
-    # Verificar se existem dados
-    if 'CATEGORIA' not in df.columns or len(df) == 0:
-        return None, pd.DataFrame(), []
-
     # Dados para o gráfico de distribuição
-    category_counts = df['CATEGORIA'].value_counts().reset_index()
+    category_counts = filtered_df['CATEGORIA'].value_counts().reset_index()
     category_counts.columns = ['Categoria', 'Quantidade']
 
     # Adicionar percentuais

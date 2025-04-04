@@ -112,3 +112,83 @@ def display_data_table(table_df, column_name, display_option):
         use_container_width=True,
         height=min(400, 100 + len(table_df) * 35)
     )
+    """
+    Exibe a tabela de dados com formatação
+    """
+    # Remover colunas desnecessárias e renomear para exibição
+    display_columns = []
+    if display_option == "Escolas" and 'GRE' in table_df.columns:
+        display_columns.append('GRE')
+    if display_option == "Escolas" and 'CIDADE' in table_df.columns:
+        display_columns.append('CIDADE')
+
+    display_columns.extend([column_name, 'MATRICULAS', 'INSCRITOS', 'TAXA_EFICIENCIA', 'CATEGORIA'])
+    table_df = table_df[display_columns].copy()
+
+    # Se estamos visualizando por GREs, adicionar "GRE" antes do número
+    if column_name == 'GRE' and 'GRE' in table_df.columns:
+        table_df['GRE'] = "GRE " + table_df['GRE'].astype(str)
+
+    column_mapping = {
+        'GRE': 'GRE',
+        'CIDADE': 'Cidade',
+        'ESCOLA': 'Escola',
+        column_name: display_option.rstrip('s'),
+        'MATRICULAS': 'Matriculados',
+        'INSCRITOS': 'Inscritos',
+        'TAXA_EFICIENCIA': 'Taxa (%)',
+        'CATEGORIA': 'Categoria'
+    }
+
+    # Aplicar mapeamento de colunas
+    valid_mapping = {col: new_col for col, new_col in column_mapping.items() if col in table_df.columns}
+    table_df = table_df.rename(columns=valid_mapping)
+
+    # Formatar a taxa para exibição
+    table_df['Taxa (%)'] = table_df['Taxa (%)'].round(1)
+
+    # Exibir tabela
+    st.dataframe(
+        table_df.sort_values('Taxa (%)', ascending=False),
+        hide_index=True,
+        use_container_width=True,
+        height=min(400, 100 + len(table_df) * 35)
+    )
+    """
+    Exibe a tabela de dados com formatação
+    """
+    # Remover colunas desnecessárias e renomear para exibição
+    display_columns = []
+    if display_option == "Escolas" and 'GRE' in table_df.columns:
+        display_columns.append('GRE')
+    if display_option == "Escolas" and 'CIDADE' in table_df.columns:
+        display_columns.append('CIDADE')
+
+    display_columns.extend([column_name, 'MATRICULAS', 'INSCRITOS', 'TAXA_EFICIENCIA', 'CATEGORIA'])
+    table_df = table_df[display_columns].copy()
+
+    column_mapping = {
+        'GRE': 'GRE',
+        'CIDADE': 'Cidade',
+        'ESCOLA': 'Escola',
+        column_name: display_option.rstrip('s'),
+        'MATRICULAS': 'Matriculados',
+        'INSCRITOS': 'Inscritos',
+        'TAXA_EFICIENCIA': 'Taxa (%)',
+        'CATEGORIA': 'Categoria'
+    }
+
+    # Aplicar mapeamento de colunas
+    valid_mapping = {col: new_col for col, new_col in column_mapping.items() if col in table_df.columns}
+    table_df = table_df.rename(columns=valid_mapping)
+
+    # Formatar a taxa para exibição
+    table_df['Taxa (%)'] = table_df['Taxa (%)'].round(1)
+
+    # Exibir tabela
+    st.dataframe(
+        table_df.sort_values('Taxa (%)', ascending=False),
+        hide_index=True,
+        use_container_width=True,
+        height=min(400, 100 + len(table_df) * 35)
+    )

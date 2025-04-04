@@ -23,47 +23,23 @@
   --input-border: 1px solid #e2e8f0;
 }
 
-/* Forçar tema claro - Regras base */
+/* Estilos base que usam as variáveis de tema */
 body {
-  background-color: var(--bg-light) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Forçar cores claras em elementos Streamlit específicos */
-.stApp,
-[data-testid="stAppViewContainer"] {
-  background-color: var(--bg-light) !important;
-}
-
-/* Sidebar sempre com fundo claro */
-[data-testid="stSidebar"],
-[data-testid="stSidebar"] > div,
-[data-testid="stSidebarNav"],
-[data-testid="stSidebarUserContent"],
-section[data-testid="stSidebar"] {
-  background-color: white !important;
-  color: var(--text-primary) !important;
-}
-
-/* Todos os elementos dentro da sidebar */
-.sidebar .sidebar-content,
-[data-testid="stSidebarNav"],
-[data-testid="stSidebarUserContent"] {
-  background-color: white !important;
-}
-
-/* Reset e base */
-.main {
-  background-color: var(--background-color) !important;
-  color: var(--text-color) !important;
+  background-color: var(--background-color);
+  color: var(--text-color);
   font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.main {
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 /* Header e títulos */
 h1,
 h2,
 h3 {
-  color: var(--primary) !important;
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -308,77 +284,6 @@ div[data-baseweb="select"] {
   background-color: var(--card-bg) !important;
 }
 
-/* Correções específicas para o tema claro */
-.stSelectbox,
-.stRadio {
-  color: var(--text-primary) !important;
-}
-
-/* Forçar fundo claro em widgets */
-.stCheckbox,
-.stRadio > div,
-.stSelectbox > div {
-  background-color: white !important;
-}
-
-/* Estilização específica para a sidebar */
-[data-testid="stSidebar"] {
-  background-color: white !important;
-  border-right: 1px solid #f0f0f0;
-}
-
-/* Estilos para os componentes dentro da sidebar */
-[data-testid="stSidebar"] .filter-container {
-  border: 1px solid #f0f0f0;
-  background-color: white !important;
-}
-
-/* Garantir que os botões na sidebar tenham fundo compatível */
-[data-testid="stSidebar"] button {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-/* Estilos para os radios e checkboxes na sidebar */
-[data-testid="stSidebar"] .stRadio label,
-[data-testid="stSidebar"] .stCheckbox label {
-  color: var(--text-primary) !important;
-}
-
-/* Garantir que os botões tenham texto escuro */
-.stButton > button {
-  color: var(--text-primary) !important;
-}
-
-/* Download button específico */
-.stDownloadButton > button {
-  background-color: var(--primary) !important;
-  color: white !important;
-}
-
-/* Forçar fonte legível */
-div,
-p,
-span {
-  color: var(--text-primary) !important;
-}
-
-/* Cores fixas para texto nos inputs */
-input,
-select,
-textarea {
-  color: #2e3a59 !important;
-}
-
-/* Forçar cor clara em DataFrames */
-.dataframe tbody {
-  background-color: white !important;
-}
-.dataframe th {
-  background-color: #f2f5f9 !important;
-  color: var(--text-primary) !important;
-}
-
 /* Remover decorações do Streamlit */
 #MainMenu {
   visibility: hidden;
@@ -388,15 +293,4 @@ footer {
 }
 header {
   visibility: hidden;
-}
-
-/* Específico para as classes de emoção do Streamlit mais recentes */
-.st-emotion-cache-16txtl3,
-.st-emotion-cache-18ni7ap,
-.st-emotion-cache-1cypcdb,
-.st-emotion-cache-6qob1r,
-.st-emotion-cache-1fttcpj,
-.st-emotion-cache-19rxjzo,
-.st-emotion-cache-z5fcl4 {
-  background-color: white !important;
 }

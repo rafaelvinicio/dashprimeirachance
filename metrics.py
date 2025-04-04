@@ -1,6 +1,6 @@
 import streamlit as st
 
-def display_metric_cards(df, column_name):
+def display_metric_cards(filtered_df, column_name):
     """
     Exibe os cartões de métricas principais
     """
@@ -8,8 +8,8 @@ def display_metric_cards(df, column_name):
 
     # Total de inscritos
     with metric_cols[0]:
-        total_inscritos = int(df['INSCRITOS'].sum())
-        total_matriculas = int(df['MATRICULAS'].sum())
+        total_inscritos = int(filtered_df['INSCRITOS'].sum())
+        total_matriculas = int(filtered_df['MATRICULAS'].sum())
         taxa_global = (total_inscritos / total_matriculas * 100) if total_matriculas > 0 else 0
 
         st.markdown("""
@@ -24,15 +24,8 @@ def display_metric_cards(df, column_name):
 
     # Total de escolas/cidades/GREs analisadas
     with metric_cols[1]:
-        # Determinar o título baseado na visualização
-        if column_name == "ESCOLA":
-            display_title = "ESCOLAS"
-        elif column_name == "CIDADE":
-            display_title = "CIDADES"
-        else:
-            display_title = "GREs"
-
-        total_entidades = len(df[column_name].unique())
+        display_option = column_name.upper() + 'S' if column_name != 'GRE' else 'GREs'
+        total_entidades = len(filtered_df[column_name].unique())
 
         st.markdown("""
         <div class="stat-card">
@@ -42,12 +35,12 @@ def display_metric_cards(df, column_name):
                 <span>Em análise</span>
             </div>
         </div>
-        """.format(display_title, total_entidades), unsafe_allow_html=True)
+        """.format(display_option, total_entidades), unsafe_allow_html=True)
 
     # Distribuição de categorias
     with metric_cols[2]:
-        excelentes = len(df[df['CATEGORIA'] == 'Excelente'])
-        pct_excelentes = (excelentes / len(df) * 100) if len(df) > 0 else 0
+        excelentes = len(filtered_df[filtered_df['CATEGORIA'] == 'Excelente'])
+        pct_excelentes = (excelentes / len(filtered_df) * 100) if len(filtered_df) > 0 else 0
 
         st.markdown("""
         <div class="stat-card">
@@ -61,19 +54,12 @@ def display_metric_cards(df, column_name):
 
     # Melhores desempenhos
     with metric_cols[3]:
-        taxa_max = df['TAXA_EFICIENCIA'].max()
-        melhor_entidade_idx = df['TAXA_EFICIENCIA'].idxmax()
-        melhor_entidade = df.loc[melhor_entidade_idx, column_name]
+        taxa_max = filtered_df['TAXA_EFICIENCIA'].max()
+        melhor_entidade_idx = filtered_df['TAXA_EFICIENCIA'].idxmax()
+        melhor_entidade = filtered_df.loc[melhor_entidade_idx, column_name]
 
-        # Garantir que exibimos o nome correto da entidade
-        if column_name == 'GRE':
-            display_name = f"GRE {melhor_entidade}"
-        else:
-            display_name = melhor_entidade
-
-        # Truncar se for muito longo
-        if len(str(display_name)) > 20:
-            display_name = str(display_name)[:18] + "..."
+        if len(melhor_entidade) > 20:
+            melhor_entidade = melhor_entidade[:18] + "..."
 
         st.markdown("""
         <div class="stat-card">
@@ -83,7 +69,7 @@ def display_metric_cards(df, column_name):
                 <span><b>{}</b></span>
             </div>
         </div>
-        """.format(taxa_max, display_name), unsafe_allow_html=True)
+        """.format(taxa_max, melhor_entidade), unsafe_allow_html=True)
 
 def display_summary_card(filtered_df):
     """
@@ -139,18 +125,11 @@ def display_summary_card(filtered_df):
         st.metric("Mediana", f"{taxa_mediana:.1f}%")
         st.metric("Máxima", f"{filtered_df['TAXA_EFICIENCIA'].max():.1f}%")
 
-def display_top_performers(df, column_name):
+def display_top_performers(filtered_df, column_name):
     """
     Exibe a lista das entidades com melhor desempenho
     """
-    # Verificar se temos dados suficientes
-    if len(df) == 0:
-        st.info("Não há dados suficientes para mostrar desempenhos.")
-        return
-
-    # Pegar as 5 melhores entidades (ou menos se não tivermos 5)
-    top_count = min(5, len(df))
-    top_entities = df.nlargest(top_count, 'TAXA_EFICIENCIA')
+    top_entities = filtered_df.nlargest(5, 'TAXA_EFICIENCIA')
 
     for i, (_, entity) in enumerate(top_entities.iterrows(), 1):
         entity_name = entity[column_name]
@@ -181,32 +160,20 @@ def display_top_performers(df, column_name):
         </div>
         """, unsafe_allow_html=True)
 
-def display_priority_attention(df, column_name):
+def display_priority_attention(filtered_df, column_name):
     """
     Exibe as entidades que precisam de atenção prioritária
     """
-    # Verificar se temos dados suficientes
-    if len(df) == 0:
-        st.info("Não há dados suficientes para análise de prioridades.")
-        return
-
     # Filtrar apenas entidades com baixo desempenho, com mais de 50 matriculados
-    low_performers = df[
-        (df['CATEGORIA'] == 'Baixo') &
-        (df['MATRICULAS'] > 50)
+    low_performers = filtered_df[
+        (filtered_df['CATEGORIA'] == 'Baixo') &
+        (filtered_df['MATRICULAS'] > 50)
     ].nlargest(5, 'MATRICULAS')
 
     if not low_performers.empty:
         for _, entity in low_performers.iterrows():
             entity_name = entity[column_name]
             taxa = entity['TAXA_EFICIENCIA']
-
-            # Garantir que exibimos o nome completo da entidade
-            # Se estamos visualizando por GREs, adicionar "GRE" antes do número
-            if column_name == 'GRE':
-                display_name = f"GRE {entity_name}"
-            else:
-                display_name = entity_name
 
             # Potencial de melhoria (diferença até atingir 50%)
             gap = 50 - taxa
@@ -215,7 +182,7 @@ def display_priority_attention(df, column_name):
             # Exibir entidade com potencial de melhoria
             st.markdown(f"""
             <div style='margin-bottom: 12px; padding: 10px; background-color: #FFF5F5; border-left: 3px solid #FF5630; border-radius: 4px;'>
-                <div style='font-weight: 600; font-size: 0.9rem;'>{display_name}</div>
+                <div style='font-weight: 600; font-size: 0.9rem;'>{entity_name}</div>
                 <div style='display: flex; justify-content: space-between; margin-top: 5px;'>
                     <div style='font-size: 0.8rem;'>
                         <span style='color: #6B7280;'>Taxa atual:</span>
