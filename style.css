@@ -284,13 +284,5 @@ div[data-baseweb="select"] {
   background-color: var(--card-bg) !important;
 }
 
-/* Remover decorações do Streamlit */
-#MainMenu {
-  visibility: hidden;
-}
-footer {
-  visibility: hidden;
-}
-header {
-  visibility: hidden;
-}
+/* IMPORTANTE: Removemos os seletores que ocultavam elementos nativos do Streamlit */
+/* Isso permitirá que a barra superior e o menu hamburger sejam exibidos */

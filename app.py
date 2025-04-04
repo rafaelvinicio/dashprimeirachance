@@ -16,7 +16,7 @@ from utils import prepare_dataframe
 from sidebar import create_sidebar
 from metrics import display_metric_cards, display_top_performers, display_priority_attention
 from visualizations import create_efficiency_map, create_ranking_chart, create_category_distribution, create_gre_analysis_chart
-from details import display_category_details, display_data_table
+from details import display_data_table
 
 # Configurações da página
 st.set_page_config(
@@ -26,77 +26,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Função para alternar o tema
-def toggle_theme():
-    # Obter o tema atual
-    theme = st.session_state.get("theme", "auto")
-
-    # Alternar entre tema claro, escuro e automático
-    if theme == "auto":
-        st.session_state.theme = "light"
-    elif theme == "light":
-        st.session_state.theme = "dark"
-    else:
-        st.session_state.theme = "auto"
-
-    # Aplicar o tema conforme a seleção
-    apply_theme(st.session_state.theme)
-
-# Função para aplicar o tema
-def apply_theme(theme):
-    if theme == "light":
-        # Tema claro
-        st.markdown("""
-        <style>
-        :root {
-            --background-color: #F8FAFC;
-            --text-color: #2E3A59;
-            --sidebar-bg: #F2F5F9;
-            --card-bg: #FFFFFF;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    elif theme == "dark":
-        # Tema escuro
-        st.markdown("""
-        <style>
-        :root {
-            --background-color: #1E1E1E;
-            --text-color: #E0E0E0;
-            --sidebar-bg: #252526;
-            --card-bg: #2D2D2D;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    else:
-        # Tema automático (baseado nas preferências do sistema)
-        pass
-
-# Inicializar o tema na sessão (padrão: automático)
-if "theme" not in st.session_state:
-    st.session_state.theme = "auto"
-
 # Carregar CSS
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Aplicar o tema atual
-apply_theme(st.session_state.theme)
-
-# Logo e cabeçalho em uma linha com o botão de tema
-header_cols = st.columns([3, 1])
-
-with header_cols[0]:
-    st.markdown("""
-    <div class="logo-container">
-        <img src="https://i.postimg.cc/dVfZXQv7/Primeira-Chance-PRINCIPAL.png" alt="Programa Primeira Chance 2025">
-    </div>
-    """, unsafe_allow_html=True)
-
-with header_cols[1]:
-    # Mostrar o tema atual e botão para alternar
-    current_theme = {"auto": "Automático", "light": "Claro", "dark": "Escuro"}
-    st.button(f"Tema: {current_theme[st.session_state.theme]}", on_click=toggle_theme)
+# Logo e cabeçalho
+st.markdown("""
+<div class="logo-container">
+    <img src="https://i.postimg.cc/dVfZXQv7/Primeira-Chance-PRINCIPAL.png" alt="Programa Primeira Chance 2025">
+</div>
+""", unsafe_allow_html=True)
 
 # Título principal
 st.markdown("<h1 style='text-align: center;'>Dashboard Analítico - Programa Primeira Chance 2025</h1>", unsafe_allow_html=True)
@@ -111,13 +50,8 @@ display_option, filtro_gre, filtro_cidade, sort_by, show_details = create_sideba
 # Preparar dados filtrados
 filtered_df, grouped_df, column_name = prepare_dataframe(df, filtro_gre, filtro_cidade, display_option)
 
-# Ordenar os dados conforme solicitado
-if sort_by == "Taxa de Eficiência":
-    grouped_df = grouped_df.sort_values('TAXA_EFICIENCIA', ascending=False)
-elif sort_by == "Número de Inscritos":
-    grouped_df = grouped_df.sort_values('INSCRITOS', ascending=False)
-else:  # Número de Matriculados
-    grouped_df = grouped_df.sort_values('MATRICULAS', ascending=False)
+# Ordenar os dados conforme solicitado (valor padrão)
+grouped_df = grouped_df.sort_values('TAXA_EFICIENCIA', ascending=False)
 
 # Cartões de métricas
 display_metric_cards(filtered_df, column_name)
@@ -199,27 +133,6 @@ with dist_cols[1]:
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
-
-# Detalhes adicionais, se opção habilitada
-if show_details:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="card-header">Análise Detalhada</div>', unsafe_allow_html=True)
-
-    # Comparação da taxa média por GRE
-    if 'GRE' in filtered_df.columns:
-        st.subheader("Taxa Média por GRE")
-
-        # Criar gráfico de análise de GRE
-        gre_fig = create_gre_analysis_chart(filtered_df)
-        if gre_fig:
-            st.plotly_chart(gre_fig, use_container_width=True)
-        else:
-            st.info("Dados insuficientes para gerar a análise por GRE.")
-
-    # Adicionando informações detalhadas sobre as categorias
-    display_category_details(filtered_df)
-
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Visualização tabulada dos dados
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)

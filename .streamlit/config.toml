@@ -5,5 +5,9 @@ secondaryBackgroundColor="#FFFFFF"
 textColor="#2E3A59"
 font="Segoe UI"
 
+[browser]
+gatherUsageStats = false
+
 [server]
 enableStaticServing = true
+maxUploadSize = 50

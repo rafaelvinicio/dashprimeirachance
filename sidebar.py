@@ -40,16 +40,6 @@ def create_sidebar(df):
                 help="Selecione uma cidade específica ou 'Todas'"
             )
 
-        # Tipo de ordenação
-        sort_by = st.radio(
-            "Ordenar por:",
-            ["Taxa de Eficiência", "Número de Inscritos", "Número de Matriculados"],
-            index=0
-        )
-
-        # Checkbox para exibir detalhes adicionais
-        show_details = st.checkbox("Exibir detalhes avançados", value=False)
-
         # Preparar o dataframe para download - corrigindo a formatação da taxa de eficiência
         download_df = df.copy()
         # Garantir que TAXA_EFICIENCIA seja um número decimal normal
@@ -86,5 +76,9 @@ def create_sidebar(df):
         """, unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
+
+    # Valores padrão para manter compatibilidade com o código existente
+    sort_by = "Taxa de Eficiência"  # Valor padrão para manter compatibilidade
+    show_details = False  # Desativado permanentemente
 
     return display_option, filtro_gre, filtro_cidade, sort_by, show_details

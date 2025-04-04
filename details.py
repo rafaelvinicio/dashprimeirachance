@@ -46,33 +46,37 @@ def display_data_table(table_df, column_name, display_option):
     """
     Exibe a tabela de dados com formatação
     """
+    # Verificar e mostrar as colunas disponíveis para debug
+    # st.write(f"Colunas disponíveis: {table_df.columns.tolist()}")
+
+    # Verificar primeiro se o DataFrame está vazio ou inválido
+    if table_df is None or len(table_df) == 0 or len(table_df.columns) == 0:
+        st.warning(f"Não há dados disponíveis para exibir a tabela de {display_option}.")
+        return
+
     # Criar uma cópia do DataFrame para evitar modificar o original
     table_df = table_df.copy()
 
-    # Verificar quais colunas estão disponíveis no DataFrame
-    available_columns = []
-
-    # Adicionar colunas relacionadas apenas se existirem no DataFrame
-    if display_option == "Escolas" and 'GRE' in table_df.columns:
-        available_columns.append('GRE')
-    if display_option == "Escolas" and 'CIDADE' in table_df.columns:
-        available_columns.append('CIDADE')
-
-    # Garantir que as colunas principais existem
-    if column_name in table_df.columns:
-        available_columns.append(column_name)
-
-    for col in ['MATRICULAS', 'INSCRITOS', 'TAXA_EFICIENCIA', 'CATEGORIA']:
-        if col in table_df.columns:
-            available_columns.append(col)
-
-    # Se não encontrar as colunas principais, exibir mensagem de erro e sair
-    if len(available_columns) < 3:  # Pelo menos o column_name e algumas métricas
-        st.error(f"Dados insuficientes para exibir a tabela de {display_option}.")
+    # Encontrar apenas as colunas que realmente existem no DataFrame
+    # Verificar se column_name existe no DataFrame
+    if column_name not in table_df.columns:
+        st.error(f"A coluna {column_name} não existe nos dados.")
         return
 
-    # Filtrar apenas as colunas disponíveis
-    table_df = table_df[available_columns]
+    # Lista para armazenar as colunas existentes que vamos usar
+    columns_to_use = [column_name]  # Garantir que a coluna principal está presente
+
+    # Verificar e adicionar colunas extras se existirem
+    for col in ['GRE', 'CIDADE', 'MATRICULAS', 'INSCRITOS', 'TAXA_EFICIENCIA', 'CATEGORIA']:
+        if col in table_df.columns and col != column_name:  # Evitar duplicação
+            columns_to_use.append(col)
+
+    # Se temos poucas colunas, mostrar uma mensagem informativa
+    if len(columns_to_use) < 2:
+        st.warning(f"Dados insuficientes para exibir uma tabela completa de {display_option}.")
+
+    # Filtrar apenas as colunas existentes
+    table_df = table_df[columns_to_use]
 
     # Se estamos visualizando por GREs, adicionar "GRE" antes do número
     if column_name == 'GRE' and 'GRE' in table_df.columns:
@@ -97,17 +101,31 @@ def display_data_table(table_df, column_name, display_option):
     valid_mapping = {col: column_mapping.get(col, col) for col in table_df.columns}
     table_df = table_df.rename(columns=valid_mapping)
 
-    # Formatar a taxa para exibição se existir
+    # Determinar a coluna para ordenação
+    sort_col = None
+
+    # Tentar usar Taxa (%) para ordenação se existir
     if 'Taxa (%)' in table_df.columns:
-        table_df['Taxa (%)'] = table_df['Taxa (%)'].round(1)
         sort_col = 'Taxa (%)'
+        table_df['Taxa (%)'] = table_df['Taxa (%)'].round(1)
+    # Tentar usar Matriculados ou Inscritos se existirem
+    elif 'Matriculados' in table_df.columns:
+        sort_col = 'Matriculados'
+    elif 'Inscritos' in table_df.columns:
+        sort_col = 'Inscritos'
+    # Caso contrário, usar a primeira coluna (que deve ser o nome da entidade)
     else:
-        # Alternativa para ordenação caso não exista a coluna Taxa
         sort_col = table_df.columns[0]
+
+    # Ordenar e exibir tabela
+    if sort_col:
+        # Ordenação descendente para números, ascendente para texto
+        ascending = not (sort_col in ['Taxa (%)', 'Matriculados', 'Inscritos'])
+        table_df = table_df.sort_values(sort_col, ascending=ascending)
 
     # Exibir tabela
     st.dataframe(
-        table_df.sort_values(sort_col, ascending=False),
+        table_df,
         hide_index=True,
         use_container_width=True,
         height=min(400, 100 + len(table_df) * 35)
