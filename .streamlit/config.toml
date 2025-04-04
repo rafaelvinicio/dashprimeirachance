@@ -1,10 +1,13 @@
 [theme]
 primaryColor="#0050B3"
 backgroundColor="#FFFFFF"
-secondaryBackgroundColor="#F8FAFC"
+secondaryBackgroundColor="#FFFFFF"
 textColor="#2E3A59"
 font="Segoe UI"
 base="light"
 
 [server]
 enableStaticServing = true
+
+[browser]
+gatherUsageStats = false

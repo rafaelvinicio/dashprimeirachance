@@ -26,15 +26,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Carregar CSS
+# Carregar CSS principal
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Injetar CSS adicional para forçar o tema claro
+# Carregar CSS específico para a sidebar
+try:
+    with open("sidebar_theme.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+except FileNotFoundError:
+    # Fallback - injeta CSS da sidebar diretamente se o arquivo não existir
+    st.markdown("""
+    <style>
+    /* Fallback para sidebar - fundo branco */
+    [data-testid="stSidebar"], [data-testid="stSidebarNav"], [data-testid="stSidebarUserContent"] {
+        background-color: white !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: #2E3A59 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Injetar CSS e JavaScript para forçar o tema claro
 st.markdown("""
 <style>
     /* Forçar tema claro independente das configurações do sistema */
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebarContent"] {
+    html, body, [data-testid="stAppViewContainer"] {
         background-color: #F8FAFC !important;
     }
     .stApp {
@@ -58,7 +76,95 @@ st.markdown("""
     .st-cg, .st-ch, .st-ci, .st-cj, .st-ae, .st-af, .st-ag, .st-ai, .st-bu {
         color: #2E3A59 !important;
     }
+
+    /* CORREÇÃO ESPECÍFICA PARA A SIDEBAR - Usando força máxima */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebar"] > div,
+    [data-testid="stSidebarNav"],
+    [data-testid="stSidebarUserContent"],
+    .st-emotion-cache-16txtl3,
+    .st-emotion-cache-18ni7ap,
+    .st-emotion-cache-1cypcdb,
+    .st-emotion-cache-6qob1r,
+    .st-emotion-cache-1fttcpj,
+    .st-emotion-cache-19rxjzo,
+    .st-emotion-cache-z5fcl4,
+    section[data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        color: #2E3A59 !important;
+    }
+
+    /* Garantir que todos os elementos na sidebar sejam da cor certa */
+    [data-testid="stSidebar"] *,
+    section[data-testid="stSidebar"] * {
+        background-color: #FFFFFF !important;
+        color: #2E3A59 !important;
+    }
+
+    /* Exceções para elementos específicos */
+    [data-testid="stSidebar"] .stButton > button,
+    [data-testid="stSidebar"] .stDownloadButton > button,
+    section[data-testid="stSidebar"] .stButton > button {
+        background-color: #0050B3 !important;
+        color: white !important;
+    }
+
+    /* Agressivamente forçar que todos textos sejam escuros */
+    [data-testid="stSidebar"] *, [data-testid="stSidebar"] > div * {
+        color: #2E3A59 !important;
+    }
+
+    /* Exceção para badges */
+    [data-testid="stSidebar"] .efficiency-badge {
+        color: white !important;
+    }
 </style>
+
+<script>
+// Script para forçar fundo branco na sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    // Função para aplicar estilo a todos os elementos da sidebar
+    function fixSidebarStyle() {
+        // Selecionar a sidebar
+        const sidebar = document.querySelector('[data-testid="stSidebar"]');
+        if (sidebar) {
+            // Aplicar estilo à sidebar
+            sidebar.style.backgroundColor = '#FFFFFF';
+
+            // Aplicar estilo a todos os elementos dentro da sidebar
+            const allElements = sidebar.querySelectorAll('*');
+            allElements.forEach(el => {
+                el.style.backgroundColor = '#FFFFFF';
+
+                // Preservar cores para botões específicos
+                if (!el.classList.contains('stButton') &&
+                    !el.classList.contains('stDownloadButton') &&
+                    !el.classList.contains('efficiency-badge')) {
+                    el.style.color = '#2E3A59';
+                }
+            });
+        }
+    }
+
+    // Executar imediatamente
+    fixSidebarStyle();
+
+    // Executar novamente após um curto atraso para pegar elementos carregados dinamicamente
+    setTimeout(fixSidebarStyle, 500);
+    setTimeout(fixSidebarStyle, 1000);
+
+    // Criar um observador para mudanças no DOM
+    const observer = new MutationObserver(function(mutations) {
+        fixSidebarStyle();
+    });
+
+    // Observar mudanças em todo o documento
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+});
+</script>
 """, unsafe_allow_html=True)
 
 # Logo e cabeçalho
