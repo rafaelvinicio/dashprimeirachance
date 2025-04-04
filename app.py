@@ -80,6 +80,24 @@ if "theme" not in st.session_state:
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Carregar CSS específico para a sidebar
+try:
+    with open("sidebar_theme.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+except FileNotFoundError:
+    # Fallback - injeta CSS da sidebar diretamente se o arquivo não existir
+    st.markdown("""
+    <style>
+    /* Fallback para sidebar - fundo branco */
+    [data-testid="stSidebar"], [data-testid="stSidebarNav"], [data-testid="stSidebarUserContent"] {
+        background-color: white !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: #2E3A59 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Aplicar o tema atual
 apply_theme(st.session_state.theme)
 
@@ -101,12 +119,19 @@ with header_cols[1]:
 # Título principal
 st.markdown("<h1 style='text-align: center;'>Dashboard Analítico - Programa Primeira Chance 2025</h1>", unsafe_allow_html=True)
 
+# Subtítulo que indica o tipo de visualização atual
+if 'display_option' in locals():
+    st.markdown(f"<h3 style='text-align: center; margin-top: -10px; margin-bottom: 20px;'>Visualização por {display_option}</h3>", unsafe_allow_html=True)
+
 # Carregar dados
 with st.spinner("Carregando dados..."):
     df = load_data()
 
 # Criar barra lateral e obter filtros
 display_option, filtro_gre, filtro_cidade, sort_by, show_details = create_sidebar(df)
+
+# Atualizar subtítulo após obter display_option
+st.markdown(f"<h3 style='text-align: center; margin-top: -10px; margin-bottom: 20px;'>Visualização por {display_option}</h3>", unsafe_allow_html=True)
 
 # Preparar dados filtrados
 filtered_df, grouped_df, column_name = prepare_dataframe(df, filtro_gre, filtro_cidade, display_option)
@@ -119,11 +144,11 @@ elif sort_by == "Número de Inscritos":
 else:  # Número de Matriculados
     grouped_df = grouped_df.sort_values('MATRICULAS', ascending=False)
 
-# Usar todos os dados disponíveis
-display_df = grouped_df
+# Usar dados agrupados para visualização
+display_df = grouped_df.copy()
 
 # Cartões de métricas
-display_metric_cards(filtered_df, column_name)
+display_metric_cards(filtered_df if display_option == "Escolas" else grouped_df, column_name)
 
 # Gráfico principal: Quadrante de Eficiência
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -138,13 +163,13 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Lista das entidades de melhor desempenho
 st.markdown('<div class="card">', unsafe_allow_html=True)
 st.markdown('<div class="card-header">Top 5 Melhores Desempenhos</div>', unsafe_allow_html=True)
-display_top_performers(filtered_df, column_name)
+display_top_performers(grouped_df, column_name)  # Usar grouped_df em vez de filtered_df
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Entidades que precisam de atenção
 st.markdown('<div class="card">', unsafe_allow_html=True)
 st.markdown('<div class="card-header">Atenção Prioritária</div>', unsafe_allow_html=True)
-display_priority_attention(filtered_df, column_name)
+display_priority_attention(grouped_df, column_name)  # Usar grouped_df em vez de filtered_df
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Gráfico secundário: Ranking de Eficiência
@@ -161,45 +186,49 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.subheader("Distribuição por Categoria de Desempenho")
 
-# Criar gráfico de distribuição
-pie_fig, category_counts, category_order = create_category_distribution(filtered_df)
+# Criar gráfico de distribuição usando o df agrupado
+pie_fig, category_counts, category_order = create_category_distribution(grouped_df)
 
-# Criar um layout de duas colunas para o gráfico e estatísticas
-dist_cols = st.columns([3, 2])
+# Verificar se o gráfico foi criado com sucesso
+if pie_fig is not None:
+    # Criar um layout de duas colunas para o gráfico e estatísticas
+    dist_cols = st.columns([3, 2])
 
-with dist_cols[0]:
-    # Exibir gráfico de pizza
-    st.plotly_chart(pie_fig, use_container_width=True)
+    with dist_cols[0]:
+        # Exibir gráfico de pizza
+        st.plotly_chart(pie_fig, use_container_width=True)
 
-with dist_cols[1]:
-    # Exibir estatísticas detalhadas em um formato mais elegante
-    st.markdown("<div style='padding: 20px 0;'>", unsafe_allow_html=True)
+    with dist_cols[1]:
+        # Exibir estatísticas detalhadas em um formato mais elegante
+        st.markdown("<div style='padding: 20px 0;'>", unsafe_allow_html=True)
 
-    for i, cat in enumerate(category_order):
-        cat_data = category_counts[category_counts['Categoria'] == cat]
-        if not cat_data.empty:
-            quantidade = int(cat_data['Quantidade'].values[0])
-            percentual = cat_data['Percentual'].values[0]
+        for i, cat in enumerate(category_order):
+            cat_data = category_counts[category_counts['Categoria'] == cat]
+            if not cat_data.empty:
+                quantidade = int(cat_data['Quantidade'].values[0])
+                percentual = cat_data['Percentual'].values[0]
 
-            # Definir cor para cada categoria
-            cat_color = "#36B37E" if cat == "Excelente" else "#FFAB00" if cat == "Médio" else "#FF5630"
+                # Definir cor para cada categoria
+                cat_color = "#36B37E" if cat == "Excelente" else "#FFAB00" if cat == "Médio" else "#FF5630"
 
-            # Estilo colorido para cada categoria
-            st.markdown(f"""
-            <div style='margin-bottom: 20px;'>
-                <div style='font-size: 16px; font-weight: 600; color: {cat_color};'>
-                    {cat} ({quantidade})
+                # Estilo colorido para cada categoria
+                st.markdown(f"""
+                <div style='margin-bottom: 20px;'>
+                    <div style='font-size: 16px; font-weight: 600; color: {cat_color};'>
+                        {cat} ({quantidade})
+                    </div>
+                    <div style='background-color: #F3F4F6; height: 8px; border-radius: 4px; margin: 8px 0;'>
+                        <div style='width: {percentual}%; height: 8px; background-color: {cat_color}; border-radius: 4px;'></div>
+                    </div>
+                    <div style='font-size: 14px; color: #4B5563;'>
+                        {percentual:.1f}% dos {display_option.lower()}
+                    </div>
                 </div>
-                <div style='background-color: #F3F4F6; height: 8px; border-radius: 4px; margin: 8px 0;'>
-                    <div style='width: {percentual}%; height: 8px; background-color: {cat_color}; border-radius: 4px;'></div>
-                </div>
-                <div style='font-size: 14px; color: #4B5563;'>
-                    {percentual:.1f}% dos {display_option.lower()}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+else:
+    st.info(f"Não há dados suficientes para mostrar a distribuição por categoria de {display_option}.")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -220,7 +249,7 @@ if show_details:
             st.info("Dados insuficientes para gerar a análise por GRE.")
 
     # Adicionando informações detalhadas sobre as categorias
-    display_category_details(filtered_df)
+    display_category_details(grouped_df if display_option != "Escolas" else filtered_df)
 
     st.markdown('</div>', unsafe_allow_html=True)
 

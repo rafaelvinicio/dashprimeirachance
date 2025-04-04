@@ -14,7 +14,7 @@ if not os.path.exists(config_file):
     with open(config_file, "w") as f:
         f.write("""[theme]
 primaryColor="#0050B3"
-backgroundColor="#F8FAFC"
+backgroundColor="#FFFFFF"
 secondaryBackgroundColor="#FFFFFF"
 textColor="#2E3A59"
 font="Segoe UI"

@@ -91,17 +91,21 @@ def prepare_dataframe(df, filtro_gre="Todas", filtro_cidade="Todas", display_opt
         # Agrupar por cidade
         grouped_df = filtered_df.groupby('CIDADE').agg({
             'INSCRITOS': 'sum',
-            'MATRICULAS': 'sum'
+            'MATRICULAS': 'sum',
+            'ESCOLA': 'count'  # Contagem de escolas por cidade
         }).reset_index()
         grouped_df['TAXA_EFICIENCIA'] = (grouped_df['INSCRITOS'] / grouped_df['MATRICULAS'] * 100).clip(0, 100)
+        grouped_df.rename(columns={'ESCOLA': 'NUM_ESCOLAS'}, inplace=True)
         column_name = 'CIDADE'
     else:  # GREs
         # Agrupar por GRE
         grouped_df = filtered_df.groupby('GRE').agg({
             'INSCRITOS': 'sum',
-            'MATRICULAS': 'sum'
+            'MATRICULAS': 'sum',
+            'ESCOLA': 'count'  # Contagem de escolas por GRE
         }).reset_index()
         grouped_df['TAXA_EFICIENCIA'] = (grouped_df['INSCRITOS'] / grouped_df['MATRICULAS'] * 100).clip(0, 100)
+        grouped_df.rename(columns={'ESCOLA': 'NUM_ESCOLAS'}, inplace=True)
         column_name = 'GRE'
 
     # Adicionar categorias aos dados agrupados
@@ -112,5 +116,11 @@ def prepare_dataframe(df, filtro_gre="Todas", filtro_cidade="Todas", display_opt
     ]
     categories = ["Baixo", "Médio", "Excelente"]
     grouped_df['CATEGORIA'] = np.select(conditions, categories, default="N/A")
+
+    # Importante: para análises adicionais, aplicamos as mesmas categorias ao dataframe filtrado
+    # Isso garante consistência nas estatísticas entre diferentes visualizações
+    filtered_df['CATEGORIA'] = filtered_df.apply(
+        lambda x: calculate_efficiency_category(x['TAXA_EFICIENCIA']), axis=1
+    )
 
     return filtered_df, grouped_df, column_name
