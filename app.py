@@ -119,9 +119,6 @@ elif sort_by == "Número de Inscritos":
 else:  # Número de Matriculados
     grouped_df = grouped_df.sort_values('MATRICULAS', ascending=False)
 
-# Usar todos os dados disponíveis
-display_df = grouped_df
-
 # Cartões de métricas
 display_metric_cards(filtered_df, column_name)
 
@@ -130,7 +127,7 @@ st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.subheader("Mapa de Eficiência de Conversão")
 
 # Criar e exibir gráfico de eficiência
-efficiency_fig = create_efficiency_map(display_df, column_name)
+efficiency_fig = create_efficiency_map(grouped_df, column_name)
 st.plotly_chart(efficiency_fig, use_container_width=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
@@ -152,7 +149,7 @@ st.markdown('<div class="chart-container">', unsafe_allow_html=True)
 st.subheader(f"Ranking de Eficiência - {display_option}")
 
 # Criar e exibir gráfico de ranking
-ranking_fig = create_ranking_chart(display_df, column_name, display_option)
+ranking_fig = create_ranking_chart(grouped_df, column_name, display_option)
 st.plotly_chart(ranking_fig, use_container_width=True)
 
 st.markdown('</div>', unsafe_allow_html=True)

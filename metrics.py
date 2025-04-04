@@ -1,4 +1,5 @@
 import streamlit as st
+from utils import prepare_dataframe
 
 def display_metric_cards(filtered_df, column_name):
     """
@@ -127,13 +128,30 @@ def display_summary_card(filtered_df):
 
 def display_top_performers(filtered_df, column_name):
     """
-    Exibe a lista das entidades com melhor desempenho
+    Exibe a lista das entidades com melhor desempenho,
+    agora usando dados corretamente agrupados para cada visualização
     """
-    top_entities = filtered_df.nlargest(5, 'TAXA_EFICIENCIA')
+    # Se estamos visualizando por Escolas, usar filtered_df diretamente
+    if column_name == 'ESCOLA':
+        display_df = filtered_df.copy()
+    else:
+        # Para Cidades ou GREs, reagrupar os dados
+        display_df = filtered_df.groupby(column_name).agg({
+            'INSCRITOS': 'sum',
+            'MATRICULAS': 'sum'
+        }).reset_index()
+
+        # Recalcular taxa de eficiência para o grupo
+        display_df['TAXA_EFICIENCIA'] = (display_df['INSCRITOS'] / display_df['MATRICULAS'] * 100).clip(0, 100)
+
+    # Selecionar top 5
+    top_entities = display_df.nlargest(5, 'TAXA_EFICIENCIA')
 
     for i, (_, entity) in enumerate(top_entities.iterrows(), 1):
         entity_name = entity[column_name]
         taxa = entity['TAXA_EFICIENCIA']
+        inscritos = entity['INSCRITOS']
+        matriculas = entity['MATRICULAS']
 
         # Garantir que exibimos o nome completo da entidade
         # Se estamos visualizando por GREs, adicionar "GRE" antes do número
@@ -151,7 +169,7 @@ def display_top_performers(filtered_df, column_name):
             <div style='flex-grow: 1;'>
                 <div style='font-weight: 600; font-size: 0.9rem;'>{display_name}</div>
                 <div style='font-size: 0.8rem; color: #6B7280;'>
-                    {entity['INSCRITOS']} inscritos de {entity['MATRICULAS']} matriculados
+                    {inscritos} inscritos de {matriculas} matriculados
                 </div>
             </div>
             <div style='font-weight: 700; font-size: 1.1rem; color: #36B37E; text-align: right;'>
@@ -162,27 +180,59 @@ def display_top_performers(filtered_df, column_name):
 
 def display_priority_attention(filtered_df, column_name):
     """
-    Exibe as entidades que precisam de atenção prioritária
+    Exibe as entidades que precisam de atenção prioritária,
+    agora usando dados corretamente agrupados para cada visualização
     """
+    # Se estamos visualizando por Escolas, usar filtered_df diretamente
+    if column_name == 'ESCOLA':
+        display_df = filtered_df.copy()
+    else:
+        # Para Cidades ou GREs, reagrupar os dados
+        display_df = filtered_df.groupby(column_name).agg({
+            'INSCRITOS': 'sum',
+            'MATRICULAS': 'sum'
+        }).reset_index()
+
+        # Recalcular taxa de eficiência para o grupo
+        display_df['TAXA_EFICIENCIA'] = (display_df['INSCRITOS'] / display_df['MATRICULAS'] * 100).clip(0, 100)
+
+        # Adicionar categorias aos dados agrupados
+        conditions = [
+            (display_df['TAXA_EFICIENCIA'] < 50),
+            (display_df['TAXA_EFICIENCIA'] >= 50) & (display_df['TAXA_EFICIENCIA'] < 85),
+            (display_df['TAXA_EFICIENCIA'] >= 85)
+        ]
+        categories = ["Baixo", "Médio", "Excelente"]
+        display_df['CATEGORIA'] = None
+        for i, condition in enumerate(conditions):
+            display_df.loc[condition, 'CATEGORIA'] = categories[i]
+
     # Filtrar apenas entidades com baixo desempenho, com mais de 50 matriculados
-    low_performers = filtered_df[
-        (filtered_df['CATEGORIA'] == 'Baixo') &
-        (filtered_df['MATRICULAS'] > 50)
+    low_performers = display_df[
+        (display_df['TAXA_EFICIENCIA'] < 50) &
+        (display_df['MATRICULAS'] > 50)
     ].nlargest(5, 'MATRICULAS')
 
     if not low_performers.empty:
         for _, entity in low_performers.iterrows():
             entity_name = entity[column_name]
             taxa = entity['TAXA_EFICIENCIA']
+            matriculas = int(entity['MATRICULAS'])
+
+            # Se estamos visualizando por GREs, adicionar "GRE" antes do número
+            if column_name == 'GRE':
+                display_name = f"GRE {entity_name}"
+            else:
+                display_name = entity_name
 
             # Potencial de melhoria (diferença até atingir 50%)
             gap = 50 - taxa
-            potential_increase = int((gap / 100) * entity['MATRICULAS'])
+            potential_increase = int((gap / 100) * matriculas)
 
             # Exibir entidade com potencial de melhoria
             st.markdown(f"""
             <div style='margin-bottom: 12px; padding: 10px; background-color: #FFF5F5; border-left: 3px solid #FF5630; border-radius: 4px;'>
-                <div style='font-weight: 600; font-size: 0.9rem;'>{entity_name}</div>
+                <div style='font-weight: 600; font-size: 0.9rem;'>{display_name}</div>
                 <div style='display: flex; justify-content: space-between; margin-top: 5px;'>
                     <div style='font-size: 0.8rem;'>
                         <span style='color: #6B7280;'>Taxa atual:</span>
@@ -190,7 +240,7 @@ def display_priority_attention(filtered_df, column_name):
                     </div>
                     <div style='font-size: 0.8rem;'>
                         <span style='color: #6B7280;'>Matriculados:</span>
-                        <span style='font-weight: 600;'>{entity['MATRICULAS']}</span>
+                        <span style='font-weight: 600;'>{matriculas}</span>
                     </div>
                 </div>
                 <div style='font-size: 0.8rem; margin-top: 5px;'>
