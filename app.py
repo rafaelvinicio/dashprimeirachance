@@ -37,9 +37,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Título principal
-st.markdown("<h1 style='text-align: center;'>Dashboard Analítico - Programa Primeira Chance 2025</h1>", unsafe_allow_html=True)
-
 # Carregar dados
 with st.spinner("Carregando dados..."):
     df = load_data()
